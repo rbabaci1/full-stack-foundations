@@ -1,5 +1,6 @@
 import { type LinksFunction } from '@remix-run/node'
 import { LiveReload, Scripts, Links } from '@remix-run/react'
+import faviconAssetUrl from './assets/favicon.svg'
 import { KCDShop } from './kcdshop.tsx'
 
 export const links: LinksFunction = () => {
@@ -7,7 +8,7 @@ export const links: LinksFunction = () => {
 		{
 			rel: 'icon',
 			type: 'image/svg+xml',
-			href: '/favicon.svg',
+			href: faviconAssetUrl,
 		},
 	]
 }
