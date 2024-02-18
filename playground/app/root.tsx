@@ -1,14 +1,15 @@
 import { type LinksFunction } from '@remix-run/node'
-import { LiveReload, Scripts, Links } from '@remix-run/react'
+import { Links, LiveReload, Scripts } from '@remix-run/react'
 import faviconAssetUrl from './assets/favicon.svg'
 import { KCDShop } from './kcdshop.tsx'
+import fontStylesSheetUrl from './styles/font.css'
 
 export const links: LinksFunction = () => {
 	return [
+		{ rel: 'icon', type: 'image/svg+xml', href: faviconAssetUrl },
 		{
-			rel: 'icon',
-			type: 'image/svg+xml',
-			href: faviconAssetUrl,
+			rel: 'stylesheet',
+			href: fontStylesSheetUrl,
 		},
 	]
 }
@@ -19,7 +20,6 @@ export default function App() {
 			<head>
 				<Links />
 			</head>
-
 			<body>
 				<p>Hello World</p>
 				<Scripts />
