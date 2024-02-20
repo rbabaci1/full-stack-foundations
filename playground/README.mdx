@@ -1,64 +1,30 @@
-# Handle Missing Data
+# Meta Overrides
 
-<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/loading/handling-error-messages-and-status-codes-in-web-development" />
+<EpicVideo url="https://www.epicweb.dev/workshops/full-stack-foundations/search-engine-optimization/dynamic-metadata-for-different-routes" />
 
-👨‍💼 One of our Quality Assurance folks discovered an issue. If you go to a user
-that does not exist, the app crashes. For example,
-try this one: <LinkToApp to="/users/i-do-not-exist" /> 😬
+👨‍💼 We want to be able to override the `title` and `description` for certain
+pages. Specifically, we want <LinkToApp to="/users/kody" /> to have the
+following meta:
 
-We had to ignore some TypeScript errors with `// @ts-expect-error` which should
-have tipped us off about this problem... 🦺 Lily the life jacket is not amused.
+- **Title**: Profile | Epic Notes
+- **Description**: Checkout this Profile on Epic Notes
 
-We need to handle this case. That should be a `404` error. So after trying to
-get the `user` from the database, you're going to need to check whether the
-returned `user` exists. If they don't, then you should throw a `404` error.
-Here's an example how you do that:
+To do this, we'll need to use
+Remix's conventional `meta` export for nested routes in combination with its
+`<Meta />` component.
 
-```tsx filename=app/routes/sandwiches.$id.tsx
-export async function loader({ params }) {
-	const sandwich = await db.sandwich.findFirst({
-		where: { id: params.id },
-	})
+As a reminder, here's what the API looks like:
 
-	if (!sandwich) {
-		throw new Response('Sandwich not found', { status: 404 })
-	}
+```tsx filename=app/routes/sandwiches.tsx
+import { type MetaFunction } from '@remix-run/react'
 
-	return json({ sandwich })
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Sandwich Shop' },
+		{ name: 'description', content: 'Fill your tummy with something yummy' },
+	]
 }
 ```
 
-Hmmm... `throw` a response!? How weird is that? Well, in Remix it's exactly how
-you solve this problem. It allows you to easily exit code flow and send a
-response right away. You can even put it into a utility function:
-
-{/* TODO: add types and make this an assertion function that infers and maintains the typing of sandwich. Possibly even make it generic. */}
-
-```tsx filename=utils.ts
-function assertDefined<Value>(
-	value: Value | null | undefined,
-): asserts value is Value {
-	if (value === undefined || value === null) {
-		throw new Response('Not found', { status: 404 })
-	}
-}
-```
-
-```tsx filename=app/routes/sandwiches.$id.tsx
-export async function loader({ params }) {
-	const sandwich = await db.sandwich.findFirst({
-		where: { id: params.id },
-	})
-
-	assertDefined(sandwich)
-
-	return json({ sandwich })
-}
-```
-
-Remix will handle catching the response for us and send the response we threw
-along. But it does so in a special way which we'll get to in a future exercise.
-For now, just handling the error with a proper status code is enough.
-
-So please handle possible missing data in the loaders of the profile, note list,
-and note routes.
+- [📜 `<Meta />`](https://remix.run/docs/en/main/components/meta)
+- [📜 `meta` export](https://remix.run/docs/en/main/route/meta-v2)

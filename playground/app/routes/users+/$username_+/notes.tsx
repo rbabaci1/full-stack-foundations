@@ -30,7 +30,6 @@ export async function loader({ params }: DataFunctionArgs) {
 
 export default function NotesRoute() {
 	const data = useLoaderData<typeof loader>()
-
 	const ownerDisplayName = data.owner.name ?? data.owner.username
 	const navLinkDefaultClassName =
 		'line-clamp-2 block rounded-l-full py-2 pl-8 pr-6 text-base lg:text-xl'
@@ -49,6 +48,8 @@ export default function NotesRoute() {
 								<li key={note.id} className="p-1 pr-0">
 									<NavLink
 										to={note.id}
+										preventScrollReset
+										prefetch="intent"
 										className={({ isActive }) =>
 											cn(navLinkDefaultClassName, isActive && 'bg-accent')
 										}

@@ -5,14 +5,18 @@ import {
 	Link,
 	Links,
 	LiveReload,
+	Meta,
+	MetaFunction,
 	Outlet,
 	Scripts,
+	ScrollRestoration,
 	useLoaderData,
 } from '@remix-run/react'
 import faviconAssetUrl from './assets/favicon.svg'
 import { KCDShop } from './kcdshop.tsx'
 import fontStylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
+import { getEnv } from './utils/env.server.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -24,7 +28,7 @@ export const links: LinksFunction = () => {
 }
 
 export async function loader() {
-	return json({ username: os.userInfo().username })
+	return json({ username: os.userInfo().username, ENV: getEnv() })
 }
 
 export default function App() {
@@ -32,6 +36,11 @@ export default function App() {
 	return (
 		<html lang="en" className="h-full overflow-x-hidden">
 			<head>
+				<Meta />
+				<title>Epic Notes</title>
+				<meta name="description" content="Your own captain's log" />
+				<meta charSet="utf-8" />
+				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
@@ -59,10 +68,23 @@ export default function App() {
 					<p>Built with ♥️ by {data.username}</p>
 				</div>
 				<div className="h-5" />
+				<ScrollRestoration />
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+					}}
+				/>
 				<Scripts />
 				<KCDShop />
 				<LiveReload />
 			</body>
 		</html>
 	)
+}
+
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Epic Notes' },
+		{ name: 'description', content: "Your own captain's log" },
+	]
 }

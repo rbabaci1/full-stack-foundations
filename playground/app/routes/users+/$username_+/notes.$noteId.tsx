@@ -1,5 +1,7 @@
-import { json, type DataFunctionArgs } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { json, redirect, type DataFunctionArgs } from '@remix-run/node'
+import { Form, Link, useLoaderData } from '@remix-run/react'
+import { floatingToolbarClassName } from '#app/components/floating-toolbar.tsx'
+import { Button } from '#app/components/ui/button.tsx'
 import { db } from '#app/utils/db.server.ts'
 import { invariantResponse } from '#app/utils/misc.tsx'
 
@@ -19,6 +21,16 @@ export async function loader({ params }: DataFunctionArgs) {
 	})
 }
 
+export async function action({ request, params }: DataFunctionArgs) {
+	const formData = await request.formData()
+	const intent = formData.get('intent')
+
+	invariantResponse(intent === 'delete', 'Invalid intent')
+
+	db.note.delete({ where: { id: { equals: params.noteId } } })
+	return redirect(`/users/${params.username}/notes`)
+}
+
 export default function NoteRoute() {
 	const data = useLoaderData<typeof loader>()
 
@@ -29,6 +41,21 @@ export default function NoteRoute() {
 				<p className="whitespace-break-spaces text-sm md:text-lg">
 					{data.note.content}
 				</p>
+			</div>
+			<div className={floatingToolbarClassName}>
+				<Form method="POST">
+					<Button
+						type="submit"
+						variant="destructive"
+						name="intent"
+						value="delete"
+					>
+						Delete
+					</Button>
+				</Form>
+				<Button asChild>
+					<Link to="edit">Edit</Link>
+				</Button>
 			</div>
 		</div>
 	)
